@@ -27,9 +27,6 @@ export class QuoteOutput extends QuoteBase {
   gasEstimate: number;
   // In USD value, 1 = 1 USD
   gasEstimateUsd: number;
-  // Percent decrease in the realized price of the path from the initial price of the path before the swap is executed. 1=1%
-  // todo check how to calculate
-  priceImpact: number;
   rawData: object;
 }
 
@@ -83,7 +80,6 @@ export class AppService {
         outputAmount: quote.outAmounts[0],
         gasEstimate: quote.gasEstimate,
         gasEstimateUsd: quote.gasEstimateValue,
-        priceImpact: quote.priceImpact / 100,
         rawData: quote,
       };
     } catch (error) {
@@ -123,9 +119,6 @@ export class AppService {
           outputAmount: _quote.amountOut,
           gasEstimate: _quote.gas,
           gasEstimateUsd: Number(_quote.gasUsd),
-          priceImpact:
-            (Number(_quote.amountOutUsd) - Number(_quote.amountInUsd)) /
-            Number(_quote.amountInUsd),
           rawData: _quote,
         };
       } else {
