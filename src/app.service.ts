@@ -25,8 +25,10 @@ export class QuoteOutput extends QuoteBase {
   outputTokenAddress: string;
   outputAmount: string;
   gasEstimate: number;
-  // In USD value, 1 = 1 USD
+  // USD value, 1 = 1 USD
   gasEstimateUsd: number;
+  // output value in USD, after deducting gas fees
+  netOutputUsd: number;
   rawData: object;
 }
 
@@ -35,7 +37,7 @@ export class AppService {
   private readonly logger = new Logger(AppService.name);
 
   async postQuote(quoteInput: QuoteInput): Promise<QuoteOutput> {
-    return await this.kyberQuote(quoteInput);
+    return await this.odosQuote(quoteInput);
   }
 
   async odosQuote(quoteInput: QuoteInput): Promise<QuoteOutput> {
@@ -78,12 +80,12 @@ export class AppService {
         protocolName: ProtocolName.odos,
         outputTokenAddress: quote.outTokens[0],
         outputAmount: quote.outAmounts[0],
+        netOutputUsd: quote.netOutValue,
         gasEstimate: quote.gasEstimate,
         gasEstimateUsd: quote.gasEstimateValue,
         rawData: quote,
       };
     } catch (error) {
-      // console.error(error);
       this.logger.error(`ODOS quote ERROR: ${error.message}`);
       return null;
     }
@@ -119,13 +121,13 @@ export class AppService {
           outputAmount: _quote.amountOut,
           gasEstimate: _quote.gas,
           gasEstimateUsd: Number(_quote.gasUsd),
+          netOutputUsd: Number(_quote.amountOutUsd) - Number(_quote.gasUsd),
           rawData: _quote,
         };
       } else {
         this.logger.error(`Kyber quote ERROR: ${quote.code}, ${quote.message}`);
       }
     } catch (error) {
-      // console.error(error);
       this.logger.error(`Kyber quote ERROR: ${error.message}`);
       return null;
     }
